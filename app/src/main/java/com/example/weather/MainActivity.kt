@@ -8,6 +8,7 @@ import android.widget.EditText
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.material3.Text
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.android.volley.toolbox.StringRequest
@@ -31,32 +32,38 @@ class MainActivity : AppCompatActivity() {
         }
         val input = findViewById<EditText>(R.id.city)
         val but: Button = findViewById(R.id.apply)
-        val dataTime: TextView = findViewById(R.id.DATATIME)
+        val dateTime: TextView = findViewById(R.id.DATATIME)
         val selectedCountry: TextView = findViewById(R.id.textView)
         val town: TextView = findViewById(R.id.textView2)
         val state: TextView = findViewById(R.id.textView3)
         val temperature: TextView = findViewById(R.id.textView4)
         val humidity: TextView = findViewById(R.id.textView5)
-        val minTemp: TextView = findViewById(R.id.textView6)
-        val maxTemp: TextView = findViewById(R.id.textView7)
+        val pressure: TextView = findViewById(R.id.textView6)
+        val feelslike: TextView = findViewById(R.id.textView7)
 
         binding.apply.setOnClickListener {
-            getResult("$input")
+            getResult(input.text.toString(),dateTime, selectedCountry, town, state, temperature,humidity,pressure, feelslike)
         }
     }
-    private fun getResult(name: String){
-        val url = "http://api.weatherapi.com/v1/current.json"+
-        "?key=$API_KEY&q=$name&aqi=no"
+    private fun getResult(name: String,dateTime: TextView, selectedCountry: TextView,town: TextView, state: TextView, temperature: TextView,humidity: TextView,pressure: TextView, feelslike: TextView ){
+        val url = "http://api.weatherapi.com/v1/current.json?key=$API_KEY&q=$name&aqi=no"
         val q = Volley.newRequestQueue(this)
         val stringRequest = StringRequest(com.android.volley.Request.Method.GET, url,
             {
                 response->
                 val obj = JSONObject(response)
                 val temp= obj.getJSONObject("current")
-                Log.d("MyLog", "Response: ${temp.getString("temp_c")}")
+                dateTime.text = temp.getString("localtime")
+                selectedCountry.text = temp.getString("country")
+                town.text = temp.getString("name")
+                state.text = temp.getString("name")
+                temperature.text = temp.getString("temp_c")
+                humidity.text = temp.getString("humidity")
+                pressure.text = temp.getString("pressure_mb")
+                feelslike.text = temp.getString("feelslike_c")
             },
             {
-                Log.d("MyLog", "Volley Error: $it")
+                Log.d("MyLog", "Volley Error: ${it.message}")
             })
         q.add(stringRequest)
     }
